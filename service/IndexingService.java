@@ -2,7 +2,7 @@ package com.sismics.reader.core.service;
 
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.AbstractScheduledService;
-import com.sismics.reader.core.constant.Constants;
+import com.sismics.reader.core.constant.LuceneConstants;
 import com.sismics.reader.core.dao.jpa.UserArticleDao;
 import com.sismics.reader.core.dao.jpa.criteria.UserArticleCriteria;
 import com.sismics.reader.core.dao.jpa.dto.UserArticleDto;
@@ -63,10 +63,10 @@ public class IndexingService extends AbstractScheduledService {
     @Override
     protected void startUp() {
         // RAM directory storage by default
-        if (luceneStorageConfig == null || luceneStorageConfig.equals(Constants.LUCENE_DIRECTORY_STORAGE_RAM)) {
+        if (luceneStorageConfig == null || luceneStorageConfig.equals(LuceneConstants.LUCENE_DIRECTORY_STORAGE_RAM)) {
             directory = new RAMDirectory();
             log.info("Using RAM Lucene storage");
-        } else if (luceneStorageConfig.equals(Constants.LUCENE_DIRECTORY_STORAGE_FILE)) {
+        } else if (luceneStorageConfig.equals(LuceneConstants.LUCENE_DIRECTORY_STORAGE_FILE)) {
             File luceneDirectory = DirectoryUtil.getLuceneDirectory();
             log.info("Using file Lucene storage: {}", luceneDirectory);
             try {

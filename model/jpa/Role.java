@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
+import javax.persistence.EnumType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -17,6 +19,16 @@ import com.google.common.base.Objects;
 @Entity
 @Table(name = "T_ROLE")
 public class Role {
+    public enum RoleStatus {
+
+        ACTIVE,
+    
+        INACTIVE,
+    
+        DELETED
+    
+    }
+    
     /**
      * Role ID.
      */
@@ -42,6 +54,23 @@ public class Role {
     @Column(name = "ROL_DELETEDATE_D")
     private Date deleteDate;
 
+
+    @Column(name = "ROL_STATUS_C", nullable = false, length = 50)
+    @Enumerated(EnumType.STRING)
+    private RoleStatus status = RoleStatus.ACTIVE;
+
+    public RoleStatus getStatus() {
+
+        return status;
+    
+    }
+    
+    
+    public void setStatus(RoleStatus status) {
+    
+        this.status = status;
+    
+    }
     /**
      * Getter of id.
      *

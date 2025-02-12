@@ -27,8 +27,13 @@ public class ArticleDao extends BaseDao<ArticleDto, ArticleCriteria> {
         List<String> criteriaList = new ArrayList<String>();
         Map<String, Object> parameterMap = new HashMap<String, Object>();
 
-        StringBuilder sb = new StringBuilder("select a.ART_ID_C, a.ART_URL_C, a.ART_GUID_C, a.ART_TITLE_C, a.ART_CREATOR_C, a.ART_DESCRIPTION_C, a.ART_COMMENTURL_C, a.ART_COMMENTCOUNT_N, a.ART_ENCLOSUREURL_C, a.ART_ENCLOSURELENGTH_N, a.ART_ENCLOSURETYPE_C, a.ART_PUBLICATIONDATE_D, a.ART_CREATEDATE_D, a.ART_IDFEED_C ")
-                .append("  from T_ARTICLE a ");
+        StringBuilder sb = new StringBuilder("select a.ART_ID_C, a.ART_IDFEED_C, " +
+                "a.ART_URL_C, a.ART_BASEURI_C, a.ART_GUID_C, " +
+                "a.ART_TITLE_C, a.ART_CREATOR_C, a.ART_DESCRIPTION_C, " +
+                "a.ART_COMMENTURL_C, a.ART_COMMENTCOUNT_N, " +
+                "a.ART_ENCLOSUREURL_C, a.ART_ENCLOSURELENGTH_N, a.ART_ENCLOSURETYPE_C, " +
+                "a.ART_PUBLICATIONDATE_D, a.ART_CREATEDATE_D ")
+                .append(" from T_ARTICLE a ");
 
         // Adds search criteria
         criteriaList.add("a.ART_DELETEDATE_D is null");
@@ -75,8 +80,17 @@ public class ArticleDao extends BaseDao<ArticleDto, ArticleCriteria> {
 
         // Create the article
         EntityManager em = ThreadLocalContext.get().getEntityManager();
-        Query q = em.createNativeQuery("insert into T_ARTICLE(ART_ID_C, ART_IDFEED_C, ART_URL_C, ART_BASEURI_C, ART_GUID_C, ART_TITLE_C, ART_CREATOR_C, ART_DESCRIPTION_C, ART_COMMENTURL_C, ART_COMMENTCOUNT_N, ART_ENCLOSUREURL_C, ART_ENCLOSURELENGTH_N, ART_ENCLOSURETYPE_C, ART_PUBLICATIONDATE_D, ART_CREATEDATE_D)" +
-                "  values (:id, :feedId, :url, :baseUri, :guid, :title, :creator, :description, :commentUrl, " + DialectUtil.getNullParameter(":commentCount", article.getCommentCount())+ ", :enclosureUrl, " + DialectUtil.getNullParameter(":enclosureLength", article.getEnclosureLength())+ ", :enclosureType, :publicationDate, :createDate)")
+        Query q = em.createNativeQuery("insert into T_ARTICLE(" +
+                "ART_ID_C, ART_IDFEED_C, " +
+                "ART_URL_C, ART_BASEURI_C, ART_GUID_C, " +
+                "ART_TITLE_C, ART_CREATOR_C, ART_DESCRIPTION_C, " +
+                "ART_COMMENTURL_C, ART_COMMENTCOUNT_N, " +
+                "ART_ENCLOSUREURL_C, ART_ENCLOSURELENGTH_N, ART_ENCLOSURETYPE_C, " +
+                "ART_PUBLICATIONDATE_D, ART_CREATEDATE_D)" +
+                " values (:id, :feedId, :url, :baseUri, :guid, :title, :creator, :description, " +
+                ":commentUrl, " + DialectUtil.getNullParameter(":commentCount", article.getCommentCount()) + ", " +
+                ":enclosureUrl, " + DialectUtil.getNullParameter(":enclosureLength", article.getEnclosureLength()) + ", " +
+                ":enclosureType, :publicationDate, :createDate)")
                 .setParameter("id", article.getId())
                 .setParameter("feedId", article.getFeedId())
                 .setParameter("url", article.getUrl())
@@ -90,6 +104,7 @@ public class ArticleDao extends BaseDao<ArticleDto, ArticleCriteria> {
                 .setParameter("enclosureType", article.getEnclosureType())
                 .setParameter("publicationDate", article.getPublicationDate())
                 .setParameter("createDate", article.getCreateDate());
+
         if (article.getCommentCount() != null) {
             q.setParameter("commentCount", article.getCommentCount());
         }
@@ -102,26 +117,29 @@ public class ArticleDao extends BaseDao<ArticleDto, ArticleCriteria> {
     }
 
     /**
-     * Updates a article.
+     * Updates an article.
      *
      * @param article Article to update
      * @return Updated article
      */
     public Article update(Article article) {
-        // Get the article
         EntityManager em = ThreadLocalContext.get().getEntityManager();
-        Query q = em.createNativeQuery("update T_ARTICLE set" +
-                "  ART_URL_C = :url," +
-                "  ART_TITLE_C = :title," +
-                "  ART_CREATOR_C = :creator," +
-                "  ART_DESCRIPTION_C = :description," +
-                "  ART_COMMENTURL_C = :commentUrl," +
-                "  ART_COMMENTCOUNT_N = " + DialectUtil.getNullParameter(":commentCount", article.getCommentCount())+ "," +
-                "  ART_ENCLOSUREURL_C = :enclosureUrl," +
-                "  ART_ENCLOSURELENGTH_N = " + DialectUtil.getNullParameter(":enclosureLength", article.getEnclosureLength())+ "," +
-                "  ART_ENCLOSURETYPE_C = :enclosureType" +
-                "  where ART_ID_C = :id and ART_DELETEDATE_D is null")
+        Query q = em.createNativeQuery("update T_ARTICLE set " +
+                "ART_URL_C = :url, " +
+                "ART_BASEURI_C = :baseUri, " +
+                "ART_GUID_C = :guid, " +
+                "ART_TITLE_C = :title, " +
+                "ART_CREATOR_C = :creator, " +
+                "ART_DESCRIPTION_C = :description, " +
+                "ART_COMMENTURL_C = :commentUrl, " +
+                "ART_COMMENTCOUNT_N = " + DialectUtil.getNullParameter(":commentCount", article.getCommentCount()) + ", " +
+                "ART_ENCLOSUREURL_C = :enclosureUrl, " +
+                "ART_ENCLOSURELENGTH_N = " + DialectUtil.getNullParameter(":enclosureLength", article.getEnclosureLength()) + ", " +
+                "ART_ENCLOSURETYPE_C = :enclosureType " +
+                "where ART_ID_C = :id and ART_DELETEDATE_D is null")
                 .setParameter("url", article.getUrl())
+                .setParameter("baseUri", article.getBaseUri())
+                .setParameter("guid", article.getGuid())
                 .setParameter("title", article.getTitle())
                 .setParameter("creator", article.getCreator())
                 .setParameter("description", article.getDescription())
@@ -129,6 +147,7 @@ public class ArticleDao extends BaseDao<ArticleDto, ArticleCriteria> {
                 .setParameter("enclosureUrl", article.getEnclosureUrl())
                 .setParameter("enclosureType", article.getEnclosureType())
                 .setParameter("id", article.getId());
+
         if (article.getCommentCount() != null) {
             q.setParameter("commentCount", article.getCommentCount());
         }
@@ -153,18 +172,22 @@ public class ArticleDao extends BaseDao<ArticleDto, ArticleCriteria> {
     }
     
     /**
-     * Deletes a article.
+     * Deletes an article.
      * 
      * @param id Article ID
      */
     public void delete(String id) {
         EntityManager em = ThreadLocalContext.get().getEntityManager();
         Date deleteDate = new Date();
-        em.createNativeQuery("update T_ARTICLE set ART_DELETEDATE_D = :deleteDate where ART_ID_C = :id and ART_DELETEDATE_D is null")
+        
+        em.createNativeQuery("update T_ARTICLE set ART_DELETEDATE_D = :deleteDate " +
+                "where ART_ID_C = :id and ART_DELETEDATE_D is null")
                 .setParameter("deleteDate", deleteDate)
                 .setParameter("id", id)
                 .executeUpdate();
-        em.createNativeQuery("update T_USER_ARTICLE set USA_DELETEDATE_D = :deleteDate where USA_IDARTICLE_C = :articleId and USA_DELETEDATE_D is null")
+        
+        em.createNativeQuery("update T_USER_ARTICLE set USA_DELETEDATE_D = :deleteDate " +
+                "where USA_IDARTICLE_C = :articleId and USA_DELETEDATE_D is null")
                 .setParameter("deleteDate", deleteDate)
                 .setParameter("articleId", id)
                 .executeUpdate();

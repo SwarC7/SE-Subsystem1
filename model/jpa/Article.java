@@ -25,43 +25,39 @@ public class Article {
      */
     @Column(name = "ART_IDFEED_C", nullable = false, length = 36)
     private String feedId;
-    
-    /**
-     * Article URL.
-     */
-    @Column(name = "ART_URL_C", length = 2000)
-    private String url;
 
     /**
-     * Relative URI (Atom).
+     * Article metadata.
      */
-    @Column(name = "ART_BASEURI_C", length = 2000)
-    private String baseUri;
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "url", column = @Column(name = "ART_URL_C", length = 2000)),
+        @AttributeOverride(name = "baseUri", column = @Column(name = "ART_BASEURI_C", length = 2000)),
+        @AttributeOverride(name = "guid", column = @Column(name = "ART_GUID_C", nullable = false, length = 2000))
+    })
+    private ArticleMetadata metadata;
 
     /**
-     * Article GUID.
+     * Article content.
      */
-    @Column(name = "ART_GUID_C", nullable = false, length = 2000)
-    private String guid;
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "title", column = @Column(name = "ART_TITLE_C", length = 4000)),
+        @AttributeOverride(name = "creator", column = @Column(name = "ART_CREATOR_C", length = 200)),
+        @AttributeOverride(name = "description", column = @Column(name = "ART_DESCRIPTION_C"))
+    })
+    private ArticleContent content;
 
     /**
-     * Article title.
+     * Article enclosure.
      */
-    @Column(name = "ART_TITLE_C", length = 4000)
-    private String title;
-
-    /**
-     * Article creator.
-     */
-    @Column(name = "ART_CREATOR_C", length = 200)
-    private String creator;
-
-    /**
-     * Article description.
-     */
-    @Lob
-    @Column(name = "ART_DESCRIPTION_C")
-    private String description;
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "url", column = @Column(name = "ART_ENCLOSUREURL_C", length = 2000)),
+        @AttributeOverride(name = "length", column = @Column(name = "ART_ENCLOSURELENGTH_N")),
+        @AttributeOverride(name = "type", column = @Column(name = "ART_ENCLOSURETYPE_C", length = 2000))
+    })
+    private ArticleEnclosure enclosure;
 
     /**
      * Comment URL.
@@ -74,24 +70,6 @@ public class Article {
      */
     @Column(name = "ART_COMMENTCOUNT_N")
     private Integer commentCount;
-
-    /**
-     * Enclosure URL.
-     */
-    @Column(name = "ART_ENCLOSUREURL_C", length = 2000)
-    private String enclosureUrl;
-
-    /**
-     * Enclosure length in bytes.
-     */
-    @Column(name = "ART_ENCLOSURELENGTH_N")
-    private Integer enclosureLength;
-
-    /**
-     * Enclosure MIME type.
-     */
-    @Column(name = "ART_ENCLOSURETYPE_C", length = 2000)
-    private String enclosureType;
 
     /**
      * Publication date.
@@ -110,307 +88,157 @@ public class Article {
      */
     @Column(name = "ART_DELETEDATE_D")
     private Date deleteDate;
-    
-    /**
-     * Getter of id.
-     *
-     * @return id
-     */
+
+    public Article() {
+        this.metadata = new ArticleMetadata();
+        this.content = new ArticleContent();
+        this.enclosure = new ArticleEnclosure();
+    }
+
+    public Article(String id) {
+        this();
+        this.id = id;
+    }
+
+    // Delegate methods for ArticleMetadata
+    public String getUrl() {
+        return metadata.getUrl();
+    }
+
+    public void setUrl(String url) {
+        metadata.setUrl(url);
+    }
+
+    public String getBaseUri() {
+        return metadata.getBaseUri();
+    }
+
+    public void setBaseUri(String baseUri) {
+        metadata.setBaseUri(baseUri);
+    }
+
+    public String getGuid() {
+        return metadata.getGuid();
+    }
+
+    public void setGuid(String guid) {
+        metadata.setGuid(guid);
+    }
+
+    // Delegate methods for ArticleContent
+    public String getTitle() {
+        return content.getTitle();
+    }
+
+    public void setTitle(String title) {
+        content.setTitle(title);
+    }
+
+    public String getCreator() {
+        return content.getCreator();
+    }
+
+    public void setCreator(String creator) {
+        content.setCreator(creator);
+    }
+
+    public String getDescription() {
+        return content.getDescription();
+    }
+
+    public void setDescription(String description) {
+        content.setDescription(description);
+    }
+
+    // Delegate methods for ArticleEnclosure
+    public String getEnclosureUrl() {
+        return enclosure.getUrl();
+    }
+
+    public void setEnclosureUrl(String url) {
+        enclosure.setUrl(url);
+    }
+
+    public Integer getEnclosureLength() {
+        return enclosure.getLength();
+    }
+
+    public void setEnclosureLength(Integer length) {
+        enclosure.setLength(length);
+    }
+
+    public String getEnclosureType() {
+        return enclosure.getType();
+    }
+
+    public void setEnclosureType(String type) {
+        enclosure.setType(type);
+    }
+
+    // Regular getters and setters
     public String getId() {
         return id;
     }
 
-    /**
-     * Setter of id.
-     *
-     * @param id id
-     */
     public void setId(String id) {
         this.id = id;
     }
 
-    /**
-     * Getter of feedId.
-     *
-     * @return feedId
-     */
     public String getFeedId() {
         return feedId;
     }
 
-    /**
-     * Setter of feedId.
-     *
-     * @param feedId feedId
-     */
     public void setFeedId(String feedId) {
         this.feedId = feedId;
     }
 
-    /**
-     * Getter of url.
-     *
-     * @return url
-     */
-    public String getUrl() {
-        return url;
-    }
-
-    /**
-     * Setter of url.
-     *
-     * @param url url
-     */
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    /**
-     * Getter of baseUri.
-     *
-     * @return baseUri
-     */
-    public String getBaseUri() {
-        return baseUri;
-    }
-
-    /**
-     * Setter of baseUri.
-     *
-     * @param baseUri baseUri
-     */
-    public void setBaseUri(String baseUri) {
-        this.baseUri = baseUri;
-    }
-
-    /**
-     * Getter of guid.
-     *
-     * @return guid
-     */
-    public String getGuid() {
-        return guid;
-    }
-
-    /**
-     * Setter of guid.
-     *
-     * @param guid guid
-     */
-    public void setGuid(String guid) {
-        this.guid = guid;
-    }
-
-    /**
-     * Getter of title.
-     *
-     * @return title
-     */
-    public String getTitle() {
-        return title;
-    }
-
-    /**
-     * Setter of title.
-     *
-     * @param title title
-     */
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    /**
-     * Getter of creator.
-     *
-     * @return creator
-     */
-    public String getCreator() {
-        return creator;
-    }
-
-    /**
-     * Setter of creator.
-     *
-     * @param creator creator
-     */
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    /**
-     * Getter of description.
-     *
-     * @return description
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * Setter of description.
-     *
-     * @param description description
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     * Getter of commentUrl.
-     *
-     * @return commentUrl
-     */
     public String getCommentUrl() {
         return commentUrl;
     }
 
-    /**
-     * Setter of commentUrl.
-     *
-     * @param commentUrl commentUrl
-     */
     public void setCommentUrl(String commentUrl) {
         this.commentUrl = commentUrl;
     }
 
-    /**
-     * Getter of commentCount.
-     *
-     * @return commentCount
-     */
     public Integer getCommentCount() {
         return commentCount;
     }
 
-    /**
-     * Setter of commentCount.
-     *
-     * @param commentCount commentCount
-     */
     public void setCommentCount(Integer commentCount) {
         this.commentCount = commentCount;
     }
 
-    /**
-     * Getter of enclosureUrl.
-     *
-     * @return enclosureUrl
-     */
-    public String getEnclosureUrl() {
-        return enclosureUrl;
-    }
-
-    /**
-     * Setter of enclosureUrl.
-     *
-     * @param enclosureUrl enclosureUrl
-     */
-    public void setEnclosureUrl(String enclosureUrl) {
-        this.enclosureUrl = enclosureUrl;
-    }
-
-    /**
-     * Getter of enclosureLength.
-     *
-     * @return enclosureLength
-     */
-    public Integer getEnclosureLength() {
-        return enclosureLength;
-    }
-
-    /**
-     * Setter of enclosureLength.
-     *
-     * @param enclosureLength enclosureLength
-     */
-    public void setEnclosureLength(Integer enclosureLength) {
-        this.enclosureLength = enclosureLength;
-    }
-
-    /**
-     * Getter of enclosureType.
-     *
-     * @return enclosureType
-     */
-    public String getEnclosureType() {
-        return enclosureType;
-    }
-
-    /**
-     * Setter of enclosureType.
-     *
-     * @param enclosureType enclosureType
-     */
-    public void setEnclosureType(String enclosureType) {
-        this.enclosureType = enclosureType;
-    }
-
-    /**
-     * Getter of publicationDate.
-     *
-     * @return publicationDate
-     */
     public Date getPublicationDate() {
         return publicationDate;
     }
 
-    /**
-     * Setter of publicationDate.
-     *
-     * @param publicationDate publicationDate
-     */
     public void setPublicationDate(Date publicationDate) {
         this.publicationDate = publicationDate;
     }
 
-    /**
-     * Getter of createDate.
-     *
-     * @return createDate
-     */
     public Date getCreateDate() {
         return createDate;
     }
 
-    /**
-     * Setter of createDate.
-     *
-     * @param createDate createDate
-     */
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
     }
 
-    /**
-     * Getter of deleteDate.
-     *
-     * @return deleteDate
-     */
     public Date getDeleteDate() {
         return deleteDate;
     }
 
-    /**
-     * Setter of deleteDate.
-     *
-     * @param deleteDate deleteDate
-     */
     public void setDeleteDate(Date deleteDate) {
         this.deleteDate = deleteDate;
-    }
-
-    public Article() {
-    }
-
-    public Article(String id) {
-        this.id = id;
     }
 
     @Override
     public String toString() {
         return Objects.toStringHelper(this)
                 .add("id", id)
-                .add("url", url)
+                .add("metadata", metadata)
+                .add("content", content)
+                .add("enclosure", enclosure)
                 .toString();
     }
 }
